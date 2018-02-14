@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit</title>
+</head>
+<body>
+    <h1>Edit</h1>
+    <a href="/">home</a>
+    <% for( i in data ){ %>
+        <p><%= data[i].name %>, <%= data[i].age %></p>
+        
+    <% } %>
+
+    <form action="/owls/<%= data[i]._id %>/update" method="post">
+        <input type="text" name="name" value="<%= data[i].name %>" placeholder="name">
+        <br>
+        <input type="text" name="age" value="<%= data[i].age %>" placeholder="age">
+        <br>
+        <input type="submit">
+    </form>
+
+
+    
+</body>
+</html>

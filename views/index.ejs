@@ -6,6 +6,15 @@
 </head>
 <body>
     <h1>Owls</h1>
+    <a href="/owls/new">add new</a>
+    <% for( i in owls ){ %>
+        <hr>
+        <p><%= owls[i].name %>, <%= owls[i].age %></p>
+        <p><%= owls[i].createdAt %>, <%= owls[i].updatedAt %></p>
+        <a href="/owls/<%= owls[i]._id %>/edit">edit</a>
+        <a href="/owls/<%= owls[i]._id %>/destroy">delete</a>
+    <% } %>
+    <hr>
     
 </body>
 </html>

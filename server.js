@@ -17,45 +17,88 @@ var OwlSchema = new mongoose.Schema( {
     name: String,
     age: Number
 }, {timestamps: true} )
-// mongoose.model( "Owl", OwlSchema );
-// var Owl = mongoose.model( "Owl" );
 var Owl = mongoose.model( "Owl", OwlSchema );
 
 mongoose.Promise = global.Promise;
 
 app.get( "/", function( req, res ){
-    res.render( "index" );
+    Owl.find( {}, function( err, owls ){
+        if( err ){
+            console.log( err );
+            res.send( err );
+        } else {
+            res.render( "index", {owls: owls} );
+        }
+    })
 });
 
+app.get( "/owls/new", function( req, res ){
+    res.render( "new" );
+});
 
+app.post( "/owls/create", function( req, res ){
+    var owl = new Owl( {name: req.body.name, age: req.body.age} );
+    owl.save( function( err ){
+        if( err ){
+            console.log( "error saving into the database" );
+            res.send( err );
+        } 
+        else {
+            console.log( "successfully saved into the database" );
+            res.redirect( "/" );
+        }
+    })
+});
 
+app.get( "/owls/:id/edit", function( req, res ){
+    Owl.find( {_id: req.params.id}, function( err, owl ){
+        if( err ){
+            console.log( err );
+            res.send( err );
+        } else {
+            res.render( "edit", {data: owl} )
+        }
+    })
+})
 
+app.post( "/owls/:id/update", function( req, res ){
+    Owl.find({_id: req.params.id }, function( err, owl ){
+        if( err ){
+            console.log( err );
+            res.send( err );
+        } else {
+            let changes = false;
+            let err2 = false;
+            for( let i in req.body ){
+                if( req.body[i] != owl[0][i] ){
+                    changes = true;
+                    Owl.update( {_id: req.params.id}, {[i]: req.body[i]}, function( err ){
+                        if( err ){
+                            err2 += err;
+                            console.log( "ERROR:", err );
+                            res.send( err );
+                            return false;
+                        }
+                    })
+                }
+            }
+            if( !changes && !err2 ){
+                res.redirect( "/" );
+            }
+        }
+    } )
+})
 
-
-
-// app.get( '/', function( req, res ) {
-//     res.render( "index" );
-// });
-
-// app.post( '/owls/new', function( req, res ){
-//     console.log( 'post data:', req.body );
-//     var owl = new Owl( {name: req.body.name, age: req.body.quote} );
-//     owl.save( function( err ){
-//         if( err ){
-//             console.log( "something went wrong" );
-//         } else {
-//             console.log( "successfully added a quote" );
-//         }
-//     })
-//     res.redirect( "/quotes" );
-// })
-
-// app.get( '/owls/:id', function( req, res ){
-//     Owl.find( {}, function( err, quotes ){
-//         console.log( quotes );
-//         res.render( "quotes", {quotes: quotes} );
-//     })
-// })
+app.get( "/owls/:id/destroy", function( req, res ){
+    Owl.remove( {_id: req.params.id}, function( err ){
+        if( err ){
+            console.log( err );
+            res.send( err );
+        } else {
+            res.redirect( "/" );
+        }
+    })
+})
 
 var server = app.listen( 8000, function() {
     console.log( "listening on port 8000" );
